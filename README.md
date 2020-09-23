@@ -144,4 +144,4 @@ type Scale interface {
 	}
 }()
 ```
-For additional examples please refer to the `examples` folder.
+For additional examples please refer to the `cmd` folder.
