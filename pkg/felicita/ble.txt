@@ -1,0 +1,75 @@
+Peripheral ID:C8:FD:19:8E:3E:3C, NAME:(FELICITA)
+  Local Name        = FELICITA
+  TX Power Level    = 0
+  Manufacturer Data = [44 29 136 160 200 253 25 142 62 60]
+  Service Data      = []
+
+Connected
+Service: 1800 (Generic Access)
+2020/09/01 08:23:36 notified by unsubscribed handle
+  Characteristic  2a00 (Device Name)
+    properties    read 
+    value         46454c4943495441 | "FELICITA"
+  Characteristic  2a01 (Appearance)
+    properties    read 
+    value         0000 | "\x00\x00"
+  Characteristic  2a02 (Peripheral Privacy Flag)
+    properties    read write 
+    value         00 | "\x00"
+2020/09/01 08:23:36 notified by unsubscribed handle
+  Characteristic  2a03 (Reconnection Address)
+    properties    write 
+  Characteristic  2a04 (Peripheral Preferred Connection Parameters)
+    properties    read 
+    value         5000a0000000e803 | "P\x00\xa0\x00\x00\x00\xe8\x03"
+
+Service: 1801 (Generic Attribute)
+  Characteristic  2a05 (Service Changed)
+    properties    indicate 
+  Descriptor      2902 (Client Characteristic Configuration)
+2020/09/01 08:23:36 notified by unsubscribed handle
+    value         0000 | "\x00\x00"
+
+Service: 180a (Device Information)
+  Characteristic  2a23 (System ID)
+    properties    read 
+    value         4147000000831500 | "AG\x00\x00\x00\x83\x15\x00"
+  Characteristic  2a24 (Model Number String)
+    properties    read 
+2020/09/01 08:23:37 notified by unsubscribed handle
+    value         4d6f64656c204e756d62657200 | "Model Number\x00"
+  Characteristic  2a25 (Serial Number String)
+    properties    read 
+    value         53657269616c204e756d62657200 | "Serial Number\x00"
+  Characteristic  2a26 (Firmware Revision String)
+    properties    read 
+    value         4669726d77617265205265766973696f6e00 | "Firmware Revision\x00"
+  Characteristic  2a27 (Hardware Revision String)
+    properties    read 
+2020/09/01 08:23:37 notified by unsubscribed handle
+    value         4861726477617265205265766973696f6e00 | "Hardware Revision\x00"
+2020/09/01 08:23:37 notified by unsubscribed handle
+  Characteristic  2a28 (Software Revision String)
+    properties    read 
+    value         536f667477617265205265766973696f6e00 | "Software Revision\x00"
+  Characteristic  2a29 (Manufacturer Name String)
+    properties    read 
+    value         4d616e756661637475726572204e616d6500 | "Manufacturer Name\x00"
+  Characteristic  2a2a (IEEE 11073-20601 Regulatory Certification Data List)
+    properties    read 
+    value         fe006578706572696d656e74616c | "\xfe\x00experimental"
+2020/09/01 08:23:37 notified by unsubscribed handle
+  Characteristic  2a50 (PnP ID)
+    properties    read 
+    value         010d0000001001 | "\x01\r\x00\x00\x00\x10\x01"
+
+Service: ffe0
+  Characteristic  ffe1
+    properties    read writeWithoutResponse write notify 
+    value         bb | "\xbb"
+2020/09/01 08:23:37 notified by unsubscribed handle
+2020/09/01 08:23:37 notified by unsubscribed handle
+  Descriptor      2902 (Client Characteristic Configuration)
+    value         0000 | "\x00\x00"
+  Descriptor      2901 (Characteristic User Description)
+    value         545820262052582d56342e30 | "TX & RX-V4.0"
