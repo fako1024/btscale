@@ -36,11 +36,11 @@ func main() {
 		log.Fatalf("Failed to initialize Felicita scale: %s", err)
 	}
 
-	s.SetDataHandler(func(data *scale.DataPoint) {
-		log.Warnf("Read DATA from Handler: %v, %v, %v, %v, %v", *data, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
+	s.SetDataHandler(func(data scale.DataPoint) {
+		log.Warnf("Read DATA from Handler: %v, %v, %v, %v, %v", data, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
 	})
 
-	dataChan := make(chan *scale.DataPoint, 256)
+	dataChan := make(chan scale.DataPoint, 256)
 	s.SetDataChannel(dataChan)
 
 	stateChan := make(chan scale.ConnectionStatus)
@@ -65,7 +65,7 @@ func main() {
 	for {
 		select {
 		default:
-			log.Warnf("Read DATA from Channel: %v, %v, %v, %v, %v", *(<-dataChan), s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
+			log.Warnf("Read DATA from Channel: %v, %v, %v, %v, %v", <-dataChan, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
 		}
 	}
 }

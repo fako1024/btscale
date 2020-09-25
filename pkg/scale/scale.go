@@ -30,10 +30,10 @@ type Basic interface {
 	SetStateChangeChannel(ch chan ConnectionStatus)
 
 	// SetDataHandler defines a handler function that is called upon retrieval of data
-	SetDataHandler(fn func(data *DataPoint))
+	SetDataHandler(fn func(data DataPoint))
 
 	// SetDataChannel defines a handler function that is called upon retrieval of data
-	SetDataChannel(ch chan *DataPoint)
+	SetDataChannel(ch chan DataPoint)
 
 	// Close terminates the connection to the device
 	Close() error

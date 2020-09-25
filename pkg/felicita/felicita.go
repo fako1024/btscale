@@ -54,8 +54,8 @@ type Felicita struct {
 	stateChangeHandler func(status scale.ConnectionStatus)
 	stateChangeChan    chan scale.ConnectionStatus
 
-	dataHandler func(data *scale.DataPoint)
-	dataChan    chan *scale.DataPoint
+	dataHandler func(data scale.DataPoint)
+	dataChan    chan scale.DataPoint
 	doneChan    chan struct{}
 
 	btDevice         gatt.Device
@@ -118,12 +118,12 @@ func (f *Felicita) SetStateChangeChannel(ch chan scale.ConnectionStatus) {
 }
 
 // SetDataHandler defines a handler function that is called upon retrieval of data
-func (f *Felicita) SetDataHandler(fn func(data *scale.DataPoint)) {
+func (f *Felicita) SetDataHandler(fn func(data scale.DataPoint)) {
 	f.dataHandler = fn
 }
 
 // SetDataChannel defines a handler function that is called upon retrieval of data
-func (f *Felicita) SetDataChannel(ch chan *scale.DataPoint) {
+func (f *Felicita) SetDataChannel(ch chan scale.DataPoint) {
 	f.dataChan = ch
 }
 
@@ -389,7 +389,7 @@ func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
 	if err != nil {
 		return
 	}
-	dataPoint := &scale.DataPoint{
+	dataPoint := scale.DataPoint{
 		TimeStamp: time.Now(),
 		Weight:    weight / 100.,
 		Unit:      parseUnit(req[9:11]),
