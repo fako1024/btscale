@@ -51,10 +51,10 @@ type Basic interface {
 	SetStateChangeChannel(ch chan ConnectionStatus)
 
 	// SetDataHandler defines a handler function that is called upon retrieval of data
-	SetDataHandler(fn func(data *DataPoint))
+	SetDataHandler(fn func(data DataPoint))
 
 	// SetDataChannel defines a handler function that is called upon retrieval of data
-	SetDataChannel(ch chan *DataPoint)
+	SetDataChannel(ch chan DataPoint)
 
 	// Close terminates the connection to the device
 	Close() error
@@ -118,7 +118,7 @@ type Scale interface {
 	}
 
 	// Set a data channel to continuously log incoming data
-	dataChan := make(chan *scale.DataPoint, 256)
+	dataChan := make(chan scale.DataPoint, 256)
 	s.SetDataChannel(dataChan)
 
 	// Setup a state handler to notify upon connection status change
