@@ -1,4 +1,4 @@
-# Go package to facilitate data access and management of bluetooth-based scales
+# Go package to facilitate data access and management of Bluetooth-based scales
 This package allows to extract structured data from bluetooth-based remote scales and provides a management interface to control said devices. Usage is fairly trivial (see examples directory for a simple console logger implementation and a tool for controlling basic functions).
 
 **NOTE: This package is currently work in progress. Interfaces and implementation are subject to change.**
