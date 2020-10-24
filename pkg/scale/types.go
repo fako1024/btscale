@@ -45,5 +45,10 @@ type DataPoint struct {
 	Weight    float64
 }
 
+// Value provides a method to retrieve the current value (for interface use)
+func (d DataPoint) Value() float64 {
+	return d.Weight
+}
+
 // DataPoints denotes a set of data points (usually part of a brew process)
 type DataPoints []DataPoint
