@@ -1,4 +1,10 @@
 # Go package to facilitate data access and management of Bluetooth-based scales
+
+[![Github Release](https://img.shields.io/github/release/fako1024/btscale.svg)](https://github.com/fako1024/btscale/releases)
+[![GoDoc](https://godoc.org/github.com/fako1024/btscale?status.svg)](https://godoc.org/github.com/fako1024/btscale/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fako1024/btscale)](https://goreportcard.com/report/github.com/fako1024/btscale)
+[![Build/Test Status](https://github.com/fako1024/btscale/workflows/Go/badge.svg)](https://github.com/fako1024/btscale/actions?query=workflow%3AGo)
+
 This package allows to extract structured data from bluetooth-based remote scales and provides a management interface to control said devices. Usage is fairly trivial (see examples directory for a simple console logger implementation and a tool for controlling basic functions).
 
 **NOTE: This package is currently work in progress. Interfaces and implementation are subject to change.**
