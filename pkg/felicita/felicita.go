@@ -29,7 +29,7 @@ const (
 	cmdTare            = 0x54
 	cmdToggleUnit      = 0x55
 
-	btSettleDelay = 250 * time.Millisecond
+	btSettleDelay = 300 * time.Millisecond
 )
 
 var (
