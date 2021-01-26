@@ -29,7 +29,8 @@ const (
 	cmdTare            = 0x54
 	cmdToggleUnit      = 0x55
 
-	btSettleDelay = 300 * time.Millisecond
+	btSettleDelay   = 50 * time.Millisecond
+	btSettleRetries = 100
 )
 
 var (
@@ -147,8 +148,14 @@ func (f *Felicita) Buzz(n int) error {
 			return err
 		}
 		n--
-		time.Sleep(btSettleDelay)
-		defer f.ToggleBuzzingOnTouch()
+		if err := f.waitForBuzzer(false); err != nil {
+			return err
+		}
+
+		defer func() {
+			f.ToggleBuzzingOnTouch()
+			f.waitForBuzzer(true)
+		}()
 	}
 
 	for i := 0; i < n; i++ {
@@ -157,11 +164,15 @@ func (f *Felicita) Buzz(n int) error {
 		if err := f.ToggleBuzzingOnTouch(); err != nil {
 			return err
 		}
-		time.Sleep(btSettleDelay)
+		if err := f.waitForBuzzer(true); err != nil {
+			return err
+		}
 		if err := f.ToggleBuzzingOnTouch(); err != nil {
 			return err
 		}
-		time.Sleep(btSettleDelay)
+		if err := f.waitForBuzzer(false); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -407,6 +418,17 @@ func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
 	if f.dataChan != nil {
 		f.dataChan <- dataPoint
 	}
+}
+
+func (f *Felicita) waitForBuzzer(targetState bool) error {
+	for i := 0; i < btSettleRetries; i++ {
+		if f.IsBuzzingOnTouch() == targetState {
+			return nil
+		}
+		time.Sleep(btSettleDelay)
+	}
+
+	return fmt.Errorf("target buzzer state %v was not reached within %v", targetState, time.Duration(btSettleRetries)*btSettleDelay)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
