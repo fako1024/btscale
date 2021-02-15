@@ -43,7 +43,7 @@ var (
 // Felicita denotes a Felicita bluetooth scale
 type Felicita struct {
 	connectionStatus scale.ConnectionStatus
-	batteryLevel     float64
+	batteryLevel     byte
 	isBuzzingOnTouch bool
 	unit             scale.Unit
 
@@ -100,7 +100,12 @@ func (f *Felicita) IsBuzzingOnTouch() bool {
 
 // BatteryLevel returns the current battery level
 func (f *Felicita) BatteryLevel() float64 {
-	return f.batteryLevel
+	return parseBatteryLevel(f.batteryLevel)
+}
+
+// BatteryLevelRaw returns the current battery level in its raw form
+func (f *Felicita) BatteryLevelRaw() int {
+	return int(f.batteryLevel)
 }
 
 // Unit returns the current weight unit
@@ -405,7 +410,7 @@ func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
 		Weight:    weight / 100.,
 		Unit:      parseUnit(req[9:11]),
 	}
-	f.batteryLevel = parseBatteryLevel(req[15])
+	f.batteryLevel = req[15]
 	f.isBuzzingOnTouch = parseSignalFlag(req[14])
 	f.unit = dataPoint.Unit
 

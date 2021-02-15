@@ -11,6 +11,9 @@ type Basic interface {
 	// BatteryLevel returns the current battery level
 	BatteryLevel() float64
 
+	// BatteryLevelRaw returns the current battery level in its raw form
+	BatteryLevelRaw() int
+
 	// Unit returns the current weight unit
 	Unit() Unit
 

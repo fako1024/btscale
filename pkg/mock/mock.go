@@ -16,7 +16,7 @@ const (
 // Mock denotes a Mock bluetooth scale
 type Mock struct {
 	connectionStatus scale.ConnectionStatus
-	batteryLevel     float64
+	batteryLevel     byte
 	isBuzzingOnTouch bool
 	isHighPrecision  bool
 	unit             scale.Unit
@@ -58,7 +58,12 @@ func (f *Mock) IsBuzzingOnTouch() bool {
 
 // BatteryLevel returns the current battery level
 func (f *Mock) BatteryLevel() float64 {
-	return f.batteryLevel
+	return float64(f.batteryLevel)
+}
+
+// BatteryLevelRaw returns the current battery level in its raw form
+func (f *Mock) BatteryLevelRaw() int {
+	return int(f.batteryLevel)
 }
 
 // Unit returns the current weight unit
