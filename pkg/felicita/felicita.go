@@ -17,7 +17,7 @@ const (
 	dataService        = "ffe0"
 	dataCharacteristic = "ffe1"
 
-	minBatteryLevel = 137.
+	minBatteryLevel = 135.
 	maxBatteryLevel = 158.
 
 	cmdStartTimer = 0x52
@@ -139,44 +139,41 @@ func (f *Felicita) Tare() error {
 }
 
 // Buzz requests the scale to beep / buzz n times
-func (f *Felicita) Buzz(n int) error {
+func (f *Felicita) Buzz(n int) (err error) {
 
 	if n <= 0 {
-		return fmt.Errorf("Invalid number of beeps requested: %d", n)
+		return fmt.Errorf("invalid number of beeps requested: %d", n)
 	}
 
 	// If the buzzer is currently turned on, shortly turn it off and ensure it is
 	// re-enabled at the end of the function. In this case, n is reduced by one since
 	// enabling the buzzer will cause yet another buzz at the end
 	if f.IsBuzzingOnTouch() {
-		if err := f.ToggleBuzzingOnTouch(); err != nil {
-			return err
+		if err = f.ToggleBuzzingOnTouch(); err != nil {
+			return
 		}
 		n--
-		if err := f.waitForBuzzer(false); err != nil {
-			return err
+		if err = f.waitForBuzzer(false); err != nil {
+			return
 		}
 
 		defer func() {
-			f.ToggleBuzzingOnTouch()
-			f.waitForBuzzer(true)
+			if derr := f.ToggleBuzzingOnTouch(); derr != nil {
+				err = derr
+				return
+			}
+			if derr := f.waitForBuzzer(true); derr != nil {
+				err = derr
+				return
+			}
 		}()
 	}
 
 	for i := 0; i < n; i++ {
 
 		// Buzz once, then restore former state
-		if err := f.ToggleBuzzingOnTouch(); err != nil {
-			return err
-		}
-		if err := f.waitForBuzzer(true); err != nil {
-			return err
-		}
-		if err := f.ToggleBuzzingOnTouch(); err != nil {
-			return err
-		}
-		if err := f.waitForBuzzer(false); err != nil {
-			return err
+		if err = f.buzzAndRestore(); err != nil {
+			return
 		}
 	}
 
@@ -296,7 +293,7 @@ func (f *Felicita) setStatus(state scale.State, err error) {
 
 func (f *Felicita) write(cmd byte) error {
 	if f.btPeripheral == nil || f.btCharacteristic == nil {
-		return fmt.Errorf("Failed to write to uninitialized device")
+		return fmt.Errorf("failed to write to uninitialized device")
 	}
 
 	return f.btPeripheral.WriteCharacteristic(f.btCharacteristic, []byte{cmd}, false)
@@ -319,11 +316,12 @@ func (f *Felicita) genOnPeriphDiscovered() func(p gatt.Peripheral, arg2 *gatt.Ad
 	return func(p gatt.Peripheral, arg2 *gatt.Advertisement, arg3 int) {
 
 		// Check if name and / or device ID have been overridden
-		if strings.ToUpper(p.Name()) != strings.ToUpper(f.deviceName) {
+		if !strings.EqualFold(p.Name(), f.deviceName) {
 			return
 		}
 		if f.deviceID != "" {
-			if strings.ToUpper(p.ID()) != strings.ToUpper(f.deviceID) {
+
+			if !strings.EqualFold(p.ID(), f.deviceID) {
 				return
 			}
 		}
@@ -334,10 +332,9 @@ func (f *Felicita) genOnPeriphDiscovered() func(p gatt.Peripheral, arg2 *gatt.Ad
 	}
 }
 
-func (f *Felicita) onPeriphConnected(p gatt.Peripheral, err error) {
+func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
 
 	f.setStatus(scale.StateConnected, nil)
-	var connErr error
 	defer func() {
 		p.Device().CancelConnection(p)
 		f.setStatus(scale.StateDisconnected, connErr)
@@ -345,14 +342,14 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, err error) {
 
 	// Set connection MTU
 	if err := p.SetMTU(500); err != nil {
-		connErr = fmt.Errorf("Failed to set MTU: %s", err)
+		connErr = fmt.Errorf("failed to set MTU: %s", err)
 		return
 	}
 
 	// Discover services
 	ss, err := p.DiscoverServices(nil)
 	if err != nil {
-		connErr = fmt.Errorf("Failed to discover services: %s", err)
+		connErr = fmt.Errorf("failed to discover services: %s", err)
 		return
 	}
 	for _, s := range ss {
@@ -361,7 +358,7 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, err error) {
 			// Discover characteristics
 			cs, err := p.DiscoverCharacteristics(nil, s)
 			if err != nil {
-				connErr = fmt.Errorf("Failed to discover characteristics: %s", err)
+				connErr = fmt.Errorf("failed to discover characteristics: %s", err)
 				return
 			}
 			for _, c := range cs {
@@ -372,12 +369,12 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, err error) {
 					// Discover descriptors
 					_, err := p.DiscoverDescriptors(nil, c)
 					if err != nil {
-						connErr = fmt.Errorf("Failed to discover descriptors: %s", err)
+						connErr = fmt.Errorf("failed to discover descriptors: %s", err)
 						return
 					}
 
 					if err := p.SetNotifyValue(c, f.receiveData); err != nil {
-						connErr = fmt.Errorf("Failed to subscribe characteristic: %s", err)
+						connErr = fmt.Errorf("failed to subscribe characteristic: %s", err)
 						return
 					}
 				}
@@ -392,17 +389,19 @@ func (f *Felicita) onPeriphDisconnected(p gatt.Peripheral, err error) {
 	close(f.doneChan)
 	f.doneChan = make(chan struct{})
 
-	f.btDevice.Init(f.onStateChanged)
+	// Cannot explicitly handle / return error here, but an error should be
+	// raised elsewhere anyways
+	_ = f.btDevice.Init(f.onStateChanged)
 }
 
 func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
 
-	if len(req) != 18 {
+	if err != nil || len(req) != 18 {
 		return
 	}
 
-	weight, err := strconv.ParseFloat(string(req[2:9]), 64)
-	if err != nil {
+	weight, convErr := strconv.ParseFloat(string(req[2:9]), 64)
+	if convErr != nil {
 		return
 	}
 	dataPoint := scale.DataPoint{
@@ -423,6 +422,23 @@ func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
 	if f.dataChan != nil {
 		f.dataChan <- dataPoint
 	}
+}
+
+func (f *Felicita) buzzAndRestore() (err error) {
+	if err = f.ToggleBuzzingOnTouch(); err != nil {
+		return
+	}
+	if err = f.waitForBuzzer(true); err != nil {
+		return
+	}
+	if err = f.ToggleBuzzingOnTouch(); err != nil {
+		return
+	}
+	if err = f.waitForBuzzer(false); err != nil {
+		return
+	}
+
+	return
 }
 
 func (f *Felicita) waitForBuzzer(targetState bool) error {
@@ -466,9 +482,5 @@ func parseBatteryLevel(data byte) float64 {
 }
 
 func parseSignalFlag(data byte) bool {
-	if data == 0x22 {
-		return true
-	}
-
-	return false
+	return data == 0x22
 }

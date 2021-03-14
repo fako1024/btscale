@@ -58,14 +58,13 @@ func main() {
 	go func() {
 		<-sigChan
 		log.Infof("Got signal, terminating connection to device")
-		s.Close()
+		if err := s.Close(); err != nil {
+			log.Errorf("Failed to close device: %s", err)
+		}
 		os.Exit(0)
 	}()
 
-	for {
-		select {
-		default:
-			log.Warnf("Read DATA from Channel: %v, %v, %v, %v, %v", <-dataChan, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
-		}
+	for v := range dataChan {
+		log.Warnf("Read DATA from Channel: %v, %v, %v, %v, %v", v, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
 	}
 }

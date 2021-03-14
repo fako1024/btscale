@@ -23,7 +23,6 @@ type Mock struct {
 
 	timer *stopwatch.Stopwatch
 
-	deviceID   string
 	deviceName string
 
 	stateChangeHandler func(status scale.ConnectionStatus)
@@ -97,33 +96,38 @@ func (f *Mock) Tare() error {
 }
 
 // Buzz requests the scale to beep / buzz n times
-func (f *Mock) Buzz(n int) error {
+func (f *Mock) Buzz(n int) (err error) {
 
 	if n <= 0 {
-		return fmt.Errorf("Invalid number of beeps requested: %d", n)
+		return fmt.Errorf("invalid number of beeps requested: %d", n)
 	}
 
 	// If the buzzer is currently turned on, shortly turn it off and ensure it is
 	// re-enabled at the end of the function. In this case, n is reduced by one since
 	// enabling the buzzer will cause yet another buzz at the end
 	if f.IsBuzzingOnTouch() {
-		if err := f.ToggleBuzzingOnTouch(); err != nil {
-			return err
+		if err = f.ToggleBuzzingOnTouch(); err != nil {
+			return
 		}
 		n--
 		time.Sleep(btSettleDelay)
-		defer f.ToggleBuzzingOnTouch()
+		defer func() {
+			if derr := f.ToggleBuzzingOnTouch(); derr != nil {
+				err = derr
+				return
+			}
+		}()
 	}
 
 	for i := 0; i < n; i++ {
 
 		// Buzz once, then restore former state
-		if err := f.ToggleBuzzingOnTouch(); err != nil {
-			return err
+		if err = f.ToggleBuzzingOnTouch(); err != nil {
+			return
 		}
 		time.Sleep(btSettleDelay)
-		if err := f.ToggleBuzzingOnTouch(); err != nil {
-			return err
+		if err = f.ToggleBuzzingOnTouch(); err != nil {
+			return
 		}
 		time.Sleep(btSettleDelay)
 	}
@@ -208,21 +212,4 @@ func (f *Mock) Close() error {
 func (f *Mock) subscribe() error {
 
 	return nil
-}
-
-func (f *Mock) setStatus(state scale.State, err error) {
-	f.connectionStatus = scale.ConnectionStatus{
-		State: state,
-		Error: err,
-	}
-
-	// Call handler function, if any
-	if f.stateChangeHandler != nil {
-		f.stateChangeHandler(f.connectionStatus)
-	}
-
-	// Put data point on channel, if any
-	if f.stateChangeChan != nil {
-		f.stateChangeChan <- f.connectionStatus
-	}
 }
