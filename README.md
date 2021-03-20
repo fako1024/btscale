@@ -20,6 +20,7 @@ This package allows to extract structured data from bluetooth-based remote scale
 	- Timestamp
 	- Weight / Unit
 - Timer functionality
+- REST API wrapper (optional) to support remote interaction with scale functions
 
 ## Installation
 ```bash
@@ -122,6 +123,9 @@ type Scale interface {
 	if err != nil {
 		logrus.StandardLogger().Fatalf("Error opening Felicita scale: %s", err)
 	}
+
+	// Start up the REST API on port 8090 (all interfaces)
+	api.New(s, ":8090")
 
 	// Set a data channel to continuously log incoming data
 	dataChan := make(chan scale.DataPoint, 256)
