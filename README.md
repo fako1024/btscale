@@ -118,42 +118,37 @@ type Scale interface {
 
 ## Example
 ```go
-	// Initialize a new Felicita bluetooth scale
-	s, err := felicita.New()
-	if err != nil {
-		logrus.StandardLogger().Fatalf("Error opening Felicita scale: %s", err)
-	}
+// Initialize a new Felicita bluetooth scale
+s, err := felicita.New()
+if err != nil {
+	logrus.StandardLogger().Fatalf("Error opening Felicita scale: %s", err)
+}
 
-	// Start up the REST API on port 8090 (all interfaces)
-	api.New(s, ":8090")
+// Start up the REST API on port 8090 (all interfaces)
+api.New(s, ":8090")
 
-	// Set a data channel to continuously log incoming data
-	dataChan := make(chan scale.DataPoint, 256)
-	s.SetDataChannel(dataChan)
+// Set a data channel to continuously log incoming data
+dataChan := make(chan scale.DataPoint, 256)
+s.SetDataChannel(dataChan)
 
-	// Setup a state handler to notify upon connection status change
-	s.SetStateChangeHandler(func(status scale.ConnectionStatus) {
-		log.Warnf("State change: %v", status)
-	})
+// Setup a state handler to notify upon connection status change
+s.SetStateChangeHandler(func(status scale.ConnectionStatus) {
+	log.Warnf("State change: %v", status)
+})
 
-	// Setup a signal channel to gracefully disconnect the bluetooth device upon termination
-	sigChan := make(chan os.Signal)
-	signal.Notify(sigChan, syscall.SIGTERM)
-	signal.Notify(sigChan, os.Interrupt)
-	go func() {
-		<-sigChan
-		log.Infof("Got signal, terminating connection to device")
-		s.Close()
-		os.Exit(0)
-	}()
-
-	// Continuously read from channel
-	for {
-		select {
-		default:
-			log.Warnf("Read DATA from Channel: %v, %v, %v, %v", *(<-dataChan), s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch())
-		}
-	}
+// Setup a signal channel to gracefully disconnect the bluetooth device upon termination
+sigChan := make(chan os.Signal)
+signal.Notify(sigChan, syscall.SIGTERM)
+signal.Notify(sigChan, os.Interrupt)
+go func() {
+	<-sigChan
+	log.Infof("Got signal, terminating connection to device")
+	s.Close()
+	os.Exit(0)
 }()
+
+for v := range dataChan {
+	log.Warnf("Read DATA from Channel: %v, %v, %v, %v, %v", v, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
+}
 ```
 For additional examples please refer to the `cmd` folder.
