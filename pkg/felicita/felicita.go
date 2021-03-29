@@ -17,7 +17,7 @@ const (
 	dataService        = "ffe0"
 	dataCharacteristic = "ffe1"
 
-	minBatteryLevel = 134.
+	minBatteryLevel = 133.
 	maxBatteryLevel = 158.
 
 	cmdStartTimer = 0x52
