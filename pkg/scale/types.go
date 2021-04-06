@@ -34,8 +34,8 @@ const (
 
 // ConnectionStatus denotes the current status of the bluetooth device
 type ConnectionStatus struct {
-	State
 	Error error
+	State
 }
 
 // DataPoint denotes a weight measurement at a certain point in time
