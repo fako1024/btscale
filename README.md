@@ -7,8 +7,6 @@
 
 This package allows to extract structured data from bluetooth-based remote scales and provides a management interface to control said devices. Usage is fairly trivial (see examples directory for a simple console logger implementation and a tool for controlling basic functions).
 
-**NOTE: This package is currently work in progress. Interfaces and implementation are subject to change.**
-
 ## Features
 - Control of basic settings (via multiple interfaces)
   - Status
@@ -38,6 +36,9 @@ type Basic interface {
 
 	// BatteryLevel returns the current battery level
 	BatteryLevel() float64
+
+	// BatteryLevelRaw returns the current battery level in its raw form
+	BatteryLevelRaw() int
 
 	// Unit returns the current weight unit
 	Unit() Unit
