@@ -119,10 +119,13 @@ type Scale interface {
 
 ## Example
 ```go
+// Initialize a simple logger for convenience
+log := logrus.StandardLogger()
+
 // Initialize a new Felicita bluetooth scale
 s, err := felicita.New()
 if err != nil {
-	logrus.StandardLogger().Fatalf("Error opening Felicita scale: %s", err)
+	log.Fatalf("Error opening Felicita scale: %s", err)
 }
 
 // Start up the REST API on port 8090 (all interfaces)
