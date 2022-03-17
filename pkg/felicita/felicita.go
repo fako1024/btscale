@@ -33,13 +33,6 @@ const (
 	btSettleRetries = 100
 )
 
-var (
-	defaultBTClientOptions = []gatt.Option{
-		gatt.LnxMaxConnections(1),
-		gatt.LnxDeviceID(-1, true),
-	}
-)
-
 // Felicita denotes a Felicita bluetooth scale
 type Felicita struct {
 	connectionStatus scale.ConnectionStatus
