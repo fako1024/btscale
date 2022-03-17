@@ -16,9 +16,9 @@ type config struct {
 	addr string
 }
 
-var log = logrus.New()
-
 func main() {
+
+	var log = logrus.New()
 
 	// Parse command line options
 	var (
