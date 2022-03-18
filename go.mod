@@ -3,7 +3,7 @@ module github.com/fako1024/btscale
 go 1.14
 
 require (
-	github.com/fako1024/gatt v1.0.1
+	github.com/fako1024/gatt v1.0.2
 	github.com/fatih/stopwatch v1.0.0
 	github.com/gofiber/fiber/v2 v2.29.0
 	github.com/klauspost/compress v1.15.1 // indirect

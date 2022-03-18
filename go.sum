@@ -3,8 +3,8 @@ github.com/andybalholm/brotli v1.0.4/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHG
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/fako1024/gatt v1.0.1 h1:BGRxhnJlLpsP/D2i0GVznAUHGbYYtZseNVDCvCU1rrg=
-github.com/fako1024/gatt v1.0.1/go.mod h1:Al+UbRXQEPmUtW5e2i5QvegN2BMKEQBKMgzf+6gHj6Y=
+github.com/fako1024/gatt v1.0.2 h1:qrBX3vGD1vjUlSFc2RxDZI111+j8k1L1h4hbx6qhUY8=
+github.com/fako1024/gatt v1.0.2/go.mod h1:TTf+fxGvaVhUZJWD9h+MMhjxsbWRBTtNC77jrCL0HtU=
 github.com/fatih/stopwatch v1.0.0 h1:sTac5Q8e+Ql27wjVze0rOHWVQqkKmhSlPmQbNlAsZz0=
 github.com/fatih/stopwatch v1.0.0/go.mod h1:OJI5FjXD3U1Y019APt3bVM7Fm94Ambcu2RTXh5FUVMs=
 github.com/gofiber/fiber/v2 v2.29.0 h1:wopU1kXxdD9XxvQqYd1vSWMGu2PiZN0yy+DojygTRRA=
@@ -12,6 +12,8 @@ github.com/gofiber/fiber/v2 v2.29.0/go.mod h1:1Ega6O199a3Y7yDGuM9FyXDPYQfv+7/y48
 github.com/klauspost/compress v1.15.0/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/klauspost/compress v1.15.1 h1:y9FcTHGyrebwfP0ZZqFiaxTaiDnUrGkJkI+f583BL1A=
 github.com/klauspost/compress v1.15.1/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
+github.com/mattn/go-pointer v0.0.1 h1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=
+github.com/mattn/go-pointer v0.0.1/go.mod h1:2zXcozF6qYGgmsG+SeTZz3oAbFLdD3OWqnUbNvJZAlc=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
