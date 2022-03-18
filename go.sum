@@ -5,6 +5,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fako1024/gatt v1.0.2 h1:qrBX3vGD1vjUlSFc2RxDZI111+j8k1L1h4hbx6qhUY8=
 github.com/fako1024/gatt v1.0.2/go.mod h1:TTf+fxGvaVhUZJWD9h+MMhjxsbWRBTtNC77jrCL0HtU=
+github.com/fako1024/gatt v1.0.3-0.20220318151855-943abb21504e h1:lLRbQqI07hu0ZjJ+w8qFyKduOBGmgTNNevaSgeoM4v8=
+github.com/fako1024/gatt v1.0.3-0.20220318151855-943abb21504e/go.mod h1:TTf+fxGvaVhUZJWD9h+MMhjxsbWRBTtNC77jrCL0HtU=
 github.com/fatih/stopwatch v1.0.0 h1:sTac5Q8e+Ql27wjVze0rOHWVQqkKmhSlPmQbNlAsZz0=
 github.com/fatih/stopwatch v1.0.0/go.mod h1:OJI5FjXD3U1Y019APt3bVM7Fm94Ambcu2RTXh5FUVMs=
 github.com/gofiber/fiber/v2 v2.29.0 h1:wopU1kXxdD9XxvQqYd1vSWMGu2PiZN0yy+DojygTRRA=
