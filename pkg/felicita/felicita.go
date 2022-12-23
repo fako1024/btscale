@@ -71,12 +71,14 @@ func New(options ...func(*Felicita)) (*Felicita, error) {
 		option(f)
 	}
 
-	// Initialize a new GATT device
-	btDevice, err := gatt.NewDevice(defaultBTClientOptions...)
-	if err != nil {
-		return nil, err
+	// Initialize a new GATT device (if not provided as option)
+	if f.btDevice == nil {
+		btDevice, err := gatt.NewDevice(defaultBTClientOptions...)
+		if err != nil {
+			return nil, err
+		}
+		f.btDevice = btDevice
 	}
-	f.btDevice = btDevice
 
 	return f, f.subscribe()
 }
