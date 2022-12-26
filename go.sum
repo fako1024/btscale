@@ -3,12 +3,8 @@ github.com/andybalholm/brotli v1.0.4/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHG
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/fako1024/gatt v1.0.2 h1:qrBX3vGD1vjUlSFc2RxDZI111+j8k1L1h4hbx6qhUY8=
-github.com/fako1024/gatt v1.0.2/go.mod h1:TTf+fxGvaVhUZJWD9h+MMhjxsbWRBTtNC77jrCL0HtU=
-github.com/fako1024/gatt v1.0.3-0.20220318151855-943abb21504e h1:lLRbQqI07hu0ZjJ+w8qFyKduOBGmgTNNevaSgeoM4v8=
-github.com/fako1024/gatt v1.0.3-0.20220318151855-943abb21504e/go.mod h1:TTf+fxGvaVhUZJWD9h+MMhjxsbWRBTtNC77jrCL0HtU=
-github.com/fako1024/gatt v1.0.3-0.20220318155319-ef767b602878 h1:JMtGaXBr2PSW9ggJsZI+EHayUSjda+s55BQVWD1Hi1U=
-github.com/fako1024/gatt v1.0.3-0.20220318155319-ef767b602878/go.mod h1:TTf+fxGvaVhUZJWD9h+MMhjxsbWRBTtNC77jrCL0HtU=
+github.com/fako1024/gatt v1.0.3-0.20221226150656-00053e17ca5c h1:WtNykc9AnOMeBv9Ufgv82zzs5/OSnm0rK+/OjKJ5Teg=
+github.com/fako1024/gatt v1.0.3-0.20221226150656-00053e17ca5c/go.mod h1:TTf+fxGvaVhUZJWD9h+MMhjxsbWRBTtNC77jrCL0HtU=
 github.com/fatih/stopwatch v1.0.0 h1:sTac5Q8e+Ql27wjVze0rOHWVQqkKmhSlPmQbNlAsZz0=
 github.com/fatih/stopwatch v1.0.0/go.mod h1:OJI5FjXD3U1Y019APt3bVM7Fm94Ambcu2RTXh5FUVMs=
 github.com/gofiber/fiber/v2 v2.29.0 h1:wopU1kXxdD9XxvQqYd1vSWMGu2PiZN0yy+DojygTRRA=
@@ -48,7 +44,6 @@ golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuX
 golang.org/x/text v0.3.6/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
 golang.org/x/text v0.3.7/go.mod h1:u+2+/6zg+i71rQMx5EYifcz6MCKuco9NR6JIITiCfzQ=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
-gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.3.0 h1:clyUAQHOM3G0M3f5vQj7LuJrETvjVot3Z5el9nffUtU=

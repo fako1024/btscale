@@ -260,9 +260,9 @@ func (f *Felicita) subscribe() error {
 
 	// Register handlers
 	f.btDevice.Handle(
-		gatt.PeripheralDiscovered(f.genOnPeriphDiscovered()),
-		gatt.PeripheralConnected(f.onPeriphConnected),
-		gatt.PeripheralDisconnected(f.onPeriphDisconnected),
+		gatt.AddPeripheralDiscovered(f.genOnPeriphDiscovered()),
+		gatt.AddPeripheralConnected(f.onPeriphConnected),
+		gatt.AddPeripheralDisconnected(f.onPeriphDisconnected),
 	)
 
 	// Initialize the device
@@ -315,7 +315,6 @@ func (f *Felicita) genOnPeriphDiscovered() func(p gatt.Peripheral, arg2 *gatt.Ad
 			return
 		}
 		if f.deviceID != "" {
-
 			if !strings.EqualFold(p.ID(), f.deviceID) {
 				return
 			}
