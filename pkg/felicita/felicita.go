@@ -55,6 +55,8 @@ type Felicita struct {
 	btDevice         gatt.Device
 	btPeripheral     gatt.Peripheral
 	btCharacteristic *gatt.Characteristic
+
+	logger scale.Logger
 }
 
 // New instantiates a new Felicita struct, executing functional options, if any
@@ -64,6 +66,7 @@ func New(options ...func(*Felicita)) (*Felicita, error) {
 	f := &Felicita{
 		deviceName: defaultDeviceName,
 		doneChan:   make(chan struct{}),
+		logger:     &scale.NullLogger{},
 	}
 
 	// Execute functional options (if any), see options.go for implementation
@@ -251,6 +254,7 @@ func (f *Felicita) ElapsedTime() time.Duration {
 func (f *Felicita) Close() error {
 	close(f.doneChan)
 
+	f.btDevice.StopScanning()
 	return f.btDevice.RemoveAllServices()
 }
 
@@ -280,9 +284,12 @@ func (f *Felicita) setStatus(state scale.State, err error) {
 		f.stateChangeHandler(f.connectionStatus)
 	}
 
-	// Put data point on channel, if any
+	// Put state change on channel, if any
 	if f.stateChangeChan != nil {
-		f.stateChangeChan <- f.connectionStatus
+		select {
+		case f.stateChangeChan <- f.connectionStatus:
+		default:
+		}
 	}
 }
 
@@ -300,33 +307,50 @@ func (f *Felicita) onStateChanged(d gatt.Device, s gatt.State) {
 	switch s {
 	case gatt.StatePoweredOn:
 		f.setStatus(scale.StateScanning, nil)
-		d.Scan([]gatt.UUID{}, false)
+		if err := d.Scan([]gatt.UUID{}, false); err != nil {
+			f.logger.Warnf("failed to enable initial scanning: %s", err)
+		}
+		return
+	case gatt.StatePoweredOff:
+		f.setStatus(scale.StateDisconnected, nil)
 		return
 	default:
-		d.StopScanning()
+		if err := d.StopScanning(); err != nil {
+			f.logger.Warnf("failed to stop initial scanning: %s", err)
+		}
 	}
 }
 
 func (f *Felicita) genOnPeriphDiscovered() func(p gatt.Peripheral, arg2 *gatt.Advertisement, arg3 int) {
 	return func(p gatt.Peripheral, arg2 *gatt.Advertisement, arg3 int) {
 
-		// Check if name and / or device ID have been overridden
-		if !strings.EqualFold(p.Name(), f.deviceName) {
+		f.logger.Debugf("discovered device `%s/%s`", p.Name(), p.ID())
+
+		if !f.thisDevice(p) {
 			return
 		}
-		if f.deviceID != "" {
-			if !strings.EqualFold(p.ID(), f.deviceID) {
-				return
-			}
-		}
+
+		f.logger.Debugf("connecting device `%s/%s`", p.Name(), p.ID())
 
 		// Stop scanning once we've got the peripheral we're looking for.
-		p.Device().StopScanning()
-		p.Device().Connect(p)
+		if err := p.Device().StopScanning(); err != nil {
+			f.logger.Warnf("failed to stop initial scanning: %s", err)
+		}
+		if err := p.Device().Connect(p); err != nil {
+			f.logger.Errorf("Failed to connect device `%s/%s`: %s", p.Name(), p.ID(), err)
+		}
+
+		f.logger.Debugf("connected device `%s/%s`", p.Name(), p.ID())
 	}
 }
 
 func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
+
+	if !f.thisDevice(p) {
+		return
+	}
+
+	f.logger.Debugf("connected peripheral `%s/%s`", p.Name(), p.ID())
 
 	f.setStatus(scale.StateConnected, nil)
 	defer func() {
@@ -336,14 +360,14 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
 
 	// Set connection MTU
 	if err := p.SetMTU(500); err != nil {
-		connErr = fmt.Errorf("failed to set MTU: %s", err)
+		connErr = fmt.Errorf("failed to set MTU: %w", err)
 		return
 	}
 
 	// Discover services
 	ss, err := p.DiscoverServices(nil)
 	if err != nil {
-		connErr = fmt.Errorf("failed to discover services: %s", err)
+		connErr = fmt.Errorf("failed to discover services: %w", err)
 		return
 	}
 	for _, s := range ss {
@@ -352,7 +376,7 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
 			// Discover characteristics
 			cs, err := p.DiscoverCharacteristics(nil, s)
 			if err != nil {
-				connErr = fmt.Errorf("failed to discover characteristics: %s", err)
+				connErr = fmt.Errorf("failed to discover characteristics: %w", err)
 				return
 			}
 			for _, c := range cs {
@@ -363,12 +387,12 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
 					// Discover descriptors
 					_, err := p.DiscoverDescriptors(nil, c)
 					if err != nil {
-						connErr = fmt.Errorf("failed to discover descriptors: %s", err)
+						connErr = fmt.Errorf("failed to discover descriptors: %w", err)
 						return
 					}
 
 					if err := p.SetNotifyValue(c, f.receiveData); err != nil {
-						connErr = fmt.Errorf("failed to subscribe characteristic: %s", err)
+						connErr = fmt.Errorf("failed to subscribe characteristic: %w", err)
 						return
 					}
 				}
@@ -376,16 +400,41 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
 		}
 	}
 
+	f.logger.Debugf("waiting to release peripheral `%s/%s`", p.Name(), p.ID())
 	<-f.doneChan
+	f.logger.Debugf("released peripheral `%s/%s`", p.Name(), p.ID())
 }
 
 func (f *Felicita) onPeriphDisconnected(p gatt.Peripheral, err error) {
-	close(f.doneChan)
-	f.doneChan = make(chan struct{})
 
-	// Cannot explicitly handle / return error here, but an error should be
-	// raised elsewhere anyways
-	_ = f.btDevice.Init(f.onStateChanged)
+	if !f.thisDevice(p) {
+		return
+	}
+
+	f.disconnect()
+	f.logger.Debugf("disconnected peripheral `%s/%s`", p.Name(), p.ID())
+
+	time.Sleep(100 * time.Millisecond)
+	f.setStatus(scale.StateScanning, nil)
+	if err := f.btDevice.Scan([]gatt.UUID{}, false); err != nil {
+		f.logger.Warnf("failed to re-enable scanning after disconnect: %s", err)
+	}
+}
+
+func (f *Felicita) thisDevice(p gatt.Peripheral) bool {
+
+	// Check if name and / or device ID have been overridden
+	if f.deviceID != "" && strings.EqualFold(p.ID(), f.deviceID) {
+		return true
+	}
+	return strings.EqualFold(p.Name(), f.deviceName)
+}
+
+func (f *Felicita) disconnect() {
+	select {
+	case f.doneChan <- struct{}{}:
+	default:
+	}
 }
 
 func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
