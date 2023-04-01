@@ -8,7 +8,6 @@ import (
 
 	"github.com/fako1024/btscale/pkg/felicita"
 	"github.com/fako1024/btscale/pkg/scale"
-	"github.com/sirupsen/logrus"
 )
 
 type config struct {
@@ -18,7 +17,7 @@ type config struct {
 
 func main() {
 
-	var log = logrus.New()
+	logger := scale.NewDefaultLogger(false)
 
 	// Parse command line options
 	var (
@@ -33,11 +32,11 @@ func main() {
 
 	s, err = felicita.New()
 	if err != nil {
-		log.Fatalf("Failed to initialize Felicita scale: %s", err)
+		logger.Fatalf("failed to initialize Felicita scale: %s", err)
 	}
 
 	s.SetDataHandler(func(data scale.DataPoint) {
-		log.Warnf("Read DATA from Handler: %v, %v, %v, %v, %v", data, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
+		logger.Warnf("read DATA from Handler: %v, %v, %v, %v, %v", data, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
 	})
 
 	dataChan := make(chan scale.DataPoint, 256)
@@ -48,7 +47,7 @@ func main() {
 
 	go func() {
 		for st := range stateChan {
-			log.Warnf("State change: %v", st)
+			logger.Warnf("state change: %v", st)
 		}
 	}()
 
@@ -57,14 +56,14 @@ func main() {
 	signal.Notify(sigChan, os.Interrupt)
 	go func() {
 		<-sigChan
-		log.Infof("Got signal, terminating connection to device")
+		logger.Infof("got signal, terminating connection to device")
 		if err := s.Close(); err != nil {
-			log.Errorf("Failed to close device: %s", err)
+			logger.Errorf("failed to close device: %s", err)
 		}
 		os.Exit(0)
 	}()
 
 	for v := range dataChan {
-		log.Warnf("Read DATA from Channel: %v, %v, %v, %v, %v", v, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
+		logger.Warnf("read DATA from Channel: %v, %v, %v, %v, %v", v, s.ConnectionStatus(), s.BatteryLevel(), s.IsBuzzingOnTouch(), s.ElapsedTime())
 	}
 }
