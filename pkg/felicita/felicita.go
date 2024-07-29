@@ -42,8 +42,10 @@ type Felicita struct {
 
 	timer *stopwatch.Stopwatch
 
-	deviceID   string
-	deviceName string
+	deviceID                    string
+	deviceName                  string
+	forceBuzzerSettingOnConnect BuzzerSetting
+	hasReceivedData             bool
 
 	stateChangeHandler func(status scale.ConnectionStatus)
 	stateChangeChan    chan scale.ConnectionStatus
@@ -254,7 +256,7 @@ func (f *Felicita) ElapsedTime() time.Duration {
 func (f *Felicita) Close() error {
 	close(f.doneChan)
 
-	f.btDevice.StopScanning()
+	_ = f.btDevice.StopScanning()
 	return f.btDevice.RemoveAllServices()
 }
 
@@ -354,7 +356,7 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
 
 	f.setStatus(scale.StateConnected, nil)
 	defer func() {
-		p.Device().CancelConnection(p)
+		_ = p.Device().CancelConnection(p)
 		f.setStatus(scale.StateDisconnected, connErr)
 	}()
 
@@ -405,7 +407,7 @@ func (f *Felicita) onPeriphConnected(p gatt.Peripheral, connErr error) {
 	f.logger.Debugf("released peripheral `%s/%s`", p.Name(), p.ID())
 }
 
-func (f *Felicita) onPeriphDisconnected(p gatt.Peripheral, err error) {
+func (f *Felicita) onPeriphDisconnected(p gatt.Peripheral, _ error) {
 
 	if !f.thisDevice(p) {
 		return
@@ -437,7 +439,7 @@ func (f *Felicita) disconnect() {
 	}
 }
 
-func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
+func (f *Felicita) receiveData(_ *gatt.Characteristic, req []byte, err error) {
 
 	if err != nil || len(req) != 18 {
 		return
@@ -455,6 +457,11 @@ func (f *Felicita) receiveData(c *gatt.Characteristic, req []byte, err error) {
 	f.batteryLevel = req[15]
 	f.isBuzzingOnTouch = parseSignalFlag(req[14])
 	f.unit = dataPoint.Unit
+
+	// Upon first data reception, check if the Buzzer is configured as expected and
+	// attempt to force the setting if not (unles not configured)
+	f.forceBuzzerSetting()
+	f.hasReceivedData = true
 
 	// Call handler function, if any
 	if f.dataHandler != nil {
@@ -493,6 +500,17 @@ func (f *Felicita) waitForBuzzer(targetState bool) error {
 	}
 
 	return fmt.Errorf("target buzzer state %v was not reached within %v", targetState, time.Duration(btSettleRetries)*btSettleDelay)
+}
+
+func (f *Felicita) forceBuzzerSetting() {
+	if !f.hasReceivedData && f.forceBuzzerSettingOnConnect != "" {
+		if f.isBuzzingOnTouch && f.forceBuzzerSettingOnConnect == BuzzerSettingOff ||
+			!f.isBuzzingOnTouch && f.forceBuzzerSettingOnConnect == BuzzerSettingOn {
+			if err := f.ToggleBuzzingOnTouch(); err != nil {
+				f.logger.Warnf("failed to force buzzer setting to `%s`: %s", f.forceBuzzerSettingOnConnect, err)
+			}
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

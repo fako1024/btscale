@@ -5,6 +5,18 @@ import (
 	"github.com/fako1024/gatt"
 )
 
+// BuzzerSetting denotes the basic Buzzer (on touch) setting of the scale
+type BuzzerSetting string
+
+const (
+
+	// BuzzerSettingOn denotes that the basic Buzzer (on touch) setting is on
+	BuzzerSettingOn = "ON"
+
+	// BuzzerSettingOff denotes that the basic Buzzer (on touch) setting is off
+	BuzzerSettingOff = "OFF"
+)
+
 // WithDeviceID sets the Bluetooth device ID
 func WithDeviceID(deviceID string) func(*Felicita) {
 	return func(f *Felicita) {
@@ -30,5 +42,13 @@ func WithDevice(btDevice gatt.Device) func(*Felicita) {
 func WithLogger(logger scale.Logger) func(*Felicita) {
 	return func(f *Felicita) {
 		f.logger = logger
+	}
+}
+
+// WithForceBuzzerSettingOnConnect ensures that the basic Buzzer (on touch) setting
+// is correct upon connection
+func WithForceBuzzerSettingOnConnect(setting BuzzerSetting) func(*Felicita) {
+	return func(f *Felicita) {
+		f.forceBuzzerSettingOnConnect = setting
 	}
 }
